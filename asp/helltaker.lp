@@ -60,13 +60,17 @@ spikes(3, 4).
 spikes(3, 5).
 spikes(2, 5).
 
+% demoness
+demoness(0, 4).
+
 fluent(F, 0) :- init(F).
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
 
-goal(at(0, 4)).
+goal(at(0, 5)).
+goal(at(1, 4)).
 
 achieved(T) :- fluent(F, T), goal(F).
 
@@ -236,6 +240,10 @@ removed(at(X, Y), T) :-
 
 :-  do(push_left, T),
     fluent(at(X, Y), T),
+    demoness(X, Y - 2).
+
+:-  do(push_left, T),
+    fluent(at(X, Y), T),
     fluent(box(X, Y - 2), T).
 
 :-  do(push_left, T),
@@ -260,6 +268,10 @@ removed(box(X, Y - 1), T) :-
 :-  do(push_right, T),
     fluent(at(X, Y), T),
     not cell(X, Y + 2).
+
+:-  do(push_right, T),
+    fluent(at(X, Y), T),
+    demoness(X, Y + 2).
 
 :-  do(push_right, T),
     fluent(at(X, Y), T),
@@ -290,6 +302,10 @@ removed(box(X, Y + 1), T) :-
 
 :-  do(push_up, T),
     fluent(at(X, Y), T),
+    demoness(X + 2, Y).
+
+:-  do(push_up, T),
+    fluent(at(X, Y), T),
     fluent(box(X + 2, Y), T).
 
 :-  do(push_up, T),
@@ -314,6 +330,10 @@ removed(box(X + 1, Y), T) :-
 :-  do(push_down, T),
     fluent(at(X, Y), T),
     not cell(X - 2, Y).
+
+:-  do(push_down, T),
+    fluent(at(X, Y), T),
+    demoness(X - 2, Y).
 
 :-  do(push_down, T),
     fluent(at(X, Y), T),
