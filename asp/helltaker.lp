@@ -52,9 +52,9 @@ achieved(T) :- fluent(F, T), goal(F).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%
-%%%%%% ACTIONS %%%%%%
-%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% ACTIONS DEPLACEMENT %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 { do(Act, T): action(Act) } = 1 :- step(T).
 
@@ -141,6 +141,102 @@ fluent(at(X - 1, Y), T + 1) :-
 
 removed(at(X, Y), T) :-
     do(down, T),
+    fluent(at(X, Y), T).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% ACTIONS PUSH BOXES %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% ACTION PUSH LEFT %%%%%%
+% préconditions
+:-  do(push_left, T),
+    fluent(at(X, Y), T),
+    not fluent(box(X, Y - 1), T).
+
+:-  do(push_left, T),
+    fluent(at(X, Y), T),
+    not cell(X, Y - 2).
+
+:-  do(push_left, T),
+    fluent(at(X, Y), T),
+    fluent(box(X, Y - 2), T).
+
+% effets
+fluent(box(X, Y - 2), T + 1) :-
+    do(push_left, T),
+    fluent(at(X, Y), T).
+
+removed(box(X, Y - 1), T) :-
+    do(push_left, T),
+    fluent(at(X, Y), T).
+
+%%%%%% ACTION PUSH RIGHT %%%%%%
+% préconditions
+:-  do(push_right, T),
+    fluent(at(X, Y), T),
+    not fluent(box(X, Y + 1), T).
+
+:-  do(push_right, T),
+    fluent(at(X, Y), T),
+    not cell(X, Y + 2).
+
+:-  do(push_right, T),
+    fluent(at(X, Y), T),
+    fluent(box(X, Y + 2), T).
+
+% effets
+fluent(box(X, Y + 2), T + 1) :-
+    do(push_right, T),
+    fluent(at(X, Y), T).
+
+removed(box(X, Y + 1), T) :-
+    do(push_right, T),
+    fluent(at(X, Y), T).
+
+%%%%%% ACTION PUSH TOP %%%%%%
+% préconditions
+:-  do(push_top, T),
+    fluent(at(X, Y), T),
+    not fluent(box(X + 1, Y), T).
+
+:-  do(push_top, T),
+    fluent(at(X, Y), T),
+    not cell(X + 2, Y).
+
+:-  do(push_top, T),
+    fluent(at(X, Y), T),
+    fluent(box(X + 2, Y), T).
+
+% effets
+fluent(box(X + 2, Y), T + 1) :-
+    do(push_top, T),
+    fluent(at(X, Y), T).
+
+removed(box(X + 1, Y), T) :-
+    do(push_top, T),
+    fluent(at(X, Y), T).
+
+%%%%%% ACTION PUSH DOWN %%%%%%
+% préconditions
+:-  do(push_down, T),
+    fluent(at(X, Y), T),
+    not fluent(box(X - 1, Y), T).
+
+:-  do(push_down, T),
+    fluent(at(X, Y), T),
+    not cell(X - 2, Y).
+
+:-  do(push_down, T),
+    fluent(at(X, Y), T),
+    fluent(box(X - 2, Y), T).
+
+% effets
+fluent(box(X - 2, Y), T + 1) :-
+    do(push_down, T),
+    fluent(at(X, Y), T).
+
+removed(box(X - 1, Y), T) :-
+    do(push_down, T),
     fluent(at(X, Y), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
