@@ -12,11 +12,14 @@
 %%%%%%% INITIALISATION %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#const n = 6.
-#const m = 6.
 step(0..maxstep-1).
 
-cell(0..m-1, 0..n-1).
+cell(0, 4..6).
+cell(1, 0..1). cell(1, 4..6).
+cell(2, 0..1). cell(2, 4..6).
+cell(3, 0..1). cell(3, 4..6).
+cell(4, 1). cell(4, 3..6).
+cell(5, 1..4).
 
 %%%%%% ACTIONS %%%%%%
 action(
@@ -32,20 +35,30 @@ action(
   monster_left;
   monster_down;
   monster_up;
+  on_spike;
   nop).
 
 %%%%%% INIT %%%%%%
 % player
-init(at(0, 1)).
+init(at(1, 0)).
 
 % boxes
-init(box(2, 2)).
-init(box(1, 3)).
+init(box(3, 4)).
+init(box(3, 5)).
+init(box(3, 6)).
 
 % monsters
-init(monster(2, 1)).
-init(monster(1, 2)).
-init(monster(0, 3)).
+init(monster(4, 1)).
+init(monster(1, 5)).
+init(monster(0, 6)).
+
+% spikes
+spikes(3, 1).
+spikes(4, 3).
+spikes(4, 4).
+spikes(3, 4).
+spikes(3, 5).
+spikes(2, 5).
 
 fluent(F, 0) :- init(F).
 
@@ -53,7 +66,7 @@ fluent(F, 0) :- init(F).
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
 
-goal(at(2, 3)).
+goal(at(0, 4)).
 
 achieved(T) :- fluent(F, T), goal(F).
 
@@ -92,6 +105,14 @@ fluent(at(X, Y - 1), T + 1) :-
     not fluent(box(X, Y - 1), T),
     not fluent(monster(X, Y - 1), T).
 
+fluent(at(X, Y - 1), T + 1) :-
+    do(left, T),
+    fluent(at(X, Y), T),
+    cell(X, Y - 1),
+    spikes(X, Y - 1),
+    not fluent(box(X, Y - 1), T),
+    not fluent(monster(X, Y - 1), T).
+
 removed(at(X, Y), T) :-
     do(left, T),
     fluent(at(X, Y), T).
@@ -118,6 +139,14 @@ fluent(at(X, Y + 1), T + 1) :-
     not fluent(box(X, Y + 1), T),
     not fluent(monster(X, Y + 1), T).
 
+fluent(at(X, Y + 1), T + 1) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    cell(X, Y + 1),
+    spikes(X, Y + 1),
+    not fluent(box(X, Y + 1), T),
+    not fluent(monster(X, Y + 1), T).
+
 removed(at(X, Y), T) :-
     do(right, T),
     fluent(at(X, Y), T).
@@ -141,6 +170,14 @@ fluent(at(X + 1, Y), T + 1) :-
     do(up, T),
     fluent(at(X, Y), T),
     cell(X + 1, Y),
+    not fluent(box(X + 1, Y), T),
+    not fluent(monster(X + 1, Y), T).
+
+fluent(at(X + 1, Y), T + 1) :-
+    do(up, T),
+    fluent(at(X, Y), T),
+    cell(X + 1, Y),
+    spikes(X + 1, Y),
     not fluent(box(X + 1, Y), T),
     not fluent(monster(X + 1, Y), T).
 
@@ -171,6 +208,14 @@ fluent(at(X - 1, Y), T + 1) :-
     not fluent(box(X - 1, Y), T),
     not fluent(monster(X - 1, Y), T).
 
+fluent(at(X - 1, Y), T + 1) :-
+    do(down, T),
+    fluent(at(X, Y), T),
+    cell(X - 1, Y),
+    spikes(X - 1, Y),
+    not fluent(box(X - 1, Y), T),
+    not fluent(monster(X - 1, Y), T).
+
 removed(at(X, Y), T) :-
     do(down, T),
     fluent(at(X, Y), T).
@@ -192,6 +237,10 @@ removed(at(X, Y), T) :-
 :-  do(push_left, T),
     fluent(at(X, Y), T),
     fluent(box(X, Y - 2), T).
+
+:-  do(push_left, T),
+    fluent(at(X, Y), T),
+    fluent(monster(X, Y - 2), T).
 
 % effets
 fluent(box(X, Y - 2), T + 1) :-
@@ -216,6 +265,10 @@ removed(box(X, Y - 1), T) :-
     fluent(at(X, Y), T),
     fluent(box(X, Y + 2), T).
 
+:-  do(push_right, T),
+    fluent(at(X, Y), T),
+    fluent(monster(X, Y + 2), T).
+
 % effets
 fluent(box(X, Y + 2), T + 1) :-
     do(push_right, T),
@@ -239,6 +292,10 @@ removed(box(X, Y + 1), T) :-
     fluent(at(X, Y), T),
     fluent(box(X + 2, Y), T).
 
+:-  do(push_up, T),
+    fluent(at(X, Y), T),
+    fluent(monster(X + 2, Y), T).
+
 % effets
 fluent(box(X + 2, Y), T + 1) :-
     do(push_up, T),
@@ -261,6 +318,10 @@ removed(box(X + 1, Y), T) :-
 :-  do(push_down, T),
     fluent(at(X, Y), T),
     fluent(box(X - 2, Y), T).
+
+:-  do(push_down, T),
+    fluent(at(X, Y), T),
+    fluent(monster(X - 2, Y), T).
 
 % effets
 fluent(box(X - 2, Y), T + 1) :-
@@ -301,6 +362,11 @@ removed(monster(X, Y - 1), T) :-
     fluent(at(X, Y), T).
 
 removed(monster(X, Y - 1), T) :-
+    spikes(X, Y - 2),
+    do(monster_left, T),
+    fluent(at(X, Y), T).
+
+removed(monster(X, Y - 1), T) :-
     not cell(X, Y - 2),
     do(monster_left, T),
     fluent(at(X, Y), T).
@@ -327,6 +393,11 @@ removed(monster(X, Y + 1), T) :-
 
 removed(monster(X, Y + 1), T) :-
     fluent(box(X, Y + 2), T),
+    do(monster_right, T),
+    fluent(at(X, Y), T).
+
+removed(monster(X, Y + 1), T) :-
+    spikes(X, Y + 2),
     do(monster_right, T),
     fluent(at(X, Y), T).
 
@@ -361,6 +432,11 @@ removed(monster(X + 1, Y), T) :-
     fluent(at(X, Y), T).
 
 removed(monster(X + 1, Y), T) :-
+    spikes(X + 2, Y),
+    do(monster_up, T),
+    fluent(at(X, Y), T).
+
+removed(monster(X + 1, Y), T) :-
     not cell(X + 2, Y),
     do(monster_up, T),
     fluent(at(X, Y), T).
@@ -391,15 +467,87 @@ removed(monster(X - 1, Y), T) :-
     fluent(at(X, Y), T).
 
 removed(monster(X - 1, Y), T) :-
+    spikes(X - 2, Y),
+    do(monster_down, T),
+    fluent(at(X, Y), T).
+
+removed(monster(X - 1, Y), T) :-
     not cell(X - 2, Y),
     do(monster_down, T),
     fluent(at(X, Y), T).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% SPIKE SPECIFICS %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% ON SPIKE %%%%%%
+% préconditions
+:-  do(on_spike, T),
+    fluent(at(X, Y), T),
+    not spikes(X, Y).
+
+:- do(up, T),
+    fluent(at(X, Y), T),
+    spikes(X + 1, Y),
+    not do(on_spike, T + 1).
+:- do(down, T),
+    fluent(at(X, Y), T),
+    spikes(X - 1, Y),
+    not do(on_spike, T + 1).
+:- do(left, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y - 1),
+    not do(on_spike, T + 1).
+:- do(right, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y + 1),
+    not do(on_spike, T + 1).
+
+:- do(monster_up, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(monster_down, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(monster_left, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(monster_right, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+
+:- do(push_up, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(push_down, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(push_left, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+:- do(push_right, T),
+    fluent(at(X, Y), T),
+    spikes(X, Y),
+    not do(on_spike, T + 1).
+
+% effets
+fluent(at(X, Y), T) :-
+    do(on_spike, T),
+    spikes(X, Y),
+    fluent(at(X, Y), T).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%% FRAME PROBLEM %%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% FRAME PROBLEM %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fluent(F, T + 1) :-
     fluent(F, T),
@@ -410,5 +558,7 @@ fluent(F, T + 1) :-
     fluent(F, T),
     achieved(T),
     T + 1 <= maxstep.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #show do/2.
