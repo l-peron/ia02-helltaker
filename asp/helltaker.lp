@@ -51,6 +51,8 @@ demoness(6, 5).
 init(chest(5, 6)).
 init(key(1, 0)).
 
+init(has_key(0)).
+
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%
@@ -116,7 +118,8 @@ fluent(at(X, Y - 1), T + 1) :-
     fluent(at(X, Y), T),
     cell(X, Y - 1),
     not fluent(box(X, Y - 1), T),
-    not fluent(monster(X, Y - 1), T).
+    not fluent(monster(X, Y - 1), T),
+    not fluent(chest(X, Y - 1), T).
 
 fluent(at(X, Y - 1), T + 1) :-
     do(left, T),
@@ -124,8 +127,27 @@ fluent(at(X, Y - 1), T + 1) :-
     cell(X, Y - 1),
     spikes(X, Y - 1),
     not fluent(box(X, Y - 1), T),
-    not fluent(monster(X, Y - 1), T).
+    not fluent(monster(X, Y - 1), T),
+    not fluent(chest(X, Y - 1), T).
 
+fluent(at(X, Y), T + 1) :-
+    do(left, T),
+    fluent(at(X, Y), T),
+    cell(X, Y - 1),
+    fluent(chest(X, Y - 1), T),
+    fluent(has_key(0), T).
+
+fluent(at(X, Y - 1), T + 1) :-
+    do(left, T),
+    fluent(at(X, Y), T),
+    cell(X, Y - 1),
+    fluent(chest(X, Y - 1), T),
+    fluent(has_key(1), T).
+
+removed(chest(X, Y - 1), T + 1) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    fluent(has_key(1), T).
 
 removed(at(X, Y), T) :-
     do(left, T),
@@ -156,7 +178,8 @@ fluent(at(X, Y + 1), T + 1) :-
     fluent(at(X, Y), T),
     cell(X, Y + 1),
     not fluent(box(X, Y + 1), T),
-    not fluent(monster(X, Y + 1), T).
+    not fluent(monster(X, Y + 1), T),
+    not fluent(chest(X, Y + 1), T).
 
 fluent(at(X, Y + 1), T + 1) :-
     do(right, T),
@@ -164,7 +187,27 @@ fluent(at(X, Y + 1), T + 1) :-
     cell(X, Y + 1),
     spikes(X, Y + 1),
     not fluent(box(X, Y + 1), T),
-    not fluent(monster(X, Y + 1), T).
+    not fluent(monster(X, Y + 1), T),
+    not fluent(chest(X, Y + 1), T).
+
+fluent(at(X, Y), T + 1) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    cell(X, Y + 1),
+    fluent(chest(X, Y + 1), T),
+    fluent(has_key(0), T).
+
+fluent(at(X, Y + 1), T + 1) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    cell(X, Y + 1),
+    fluent(chest(X, Y + 1), T),
+    fluent(has_key(1), T).
+
+removed(chest(X, Y + 1), T + 1) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    fluent(has_key(1), T).
 
 removed(at(X, Y), T) :-
     do(right, T),
@@ -195,7 +238,8 @@ fluent(at(X + 1, Y), T + 1) :-
     fluent(at(X, Y), T),
     cell(X + 1, Y),
     not fluent(box(X + 1, Y), T),
-    not fluent(monster(X + 1, Y), T).
+    not fluent(monster(X + 1, Y), T),
+    not fluent(chest(X + 1, Y), T).
 
 fluent(at(X + 1, Y), T + 1) :-
     do(up, T),
@@ -203,7 +247,27 @@ fluent(at(X + 1, Y), T + 1) :-
     cell(X + 1, Y),
     spikes(X + 1, Y),
     not fluent(box(X + 1, Y), T),
-    not fluent(monster(X + 1, Y), T).
+    not fluent(monster(X + 1, Y), T),
+    not fluent(chest(X + 1, Y), T).
+
+fluent(at(X, Y), T + 1) :-
+    do(up, T),
+    fluent(at(X, Y), T),
+    cell(X + 1, Y),
+    fluent(chest(X + 1, Y), T),
+    fluent(has_key(0), T).
+
+fluent(at(X + 1, Y), T + 1) :-
+    do(up, T),
+    fluent(at(X, Y), T),
+    cell(X + 1, Y),
+    fluent(chest(X + 1, Y), T),
+    fluent(has_key(1), T).
+
+removed(chest(X + 1, Y), T + 1) :-
+    do(up, T),
+    fluent(at(X, Y), T),
+    fluent(has_key(1), T).
 
 removed(at(X, Y), T) :-
     do(up, T),
@@ -216,13 +280,18 @@ removed(at(X, Y), T) :-
     fluent(at(X, Y), T),
     not cell(X - 1, Y).
 
-:-  do(up, T),
+:-  do(down, T),
     fluent(at(X, Y), T),
     fluent(box(X - 1, Y), T).
 
-:-  do(up, T),
+:-  do(down, T),
     fluent(at(X, Y), T),
     fluent(monster(X - 1, Y), T).
+
+:- do(down, T),
+    fluent(at(X, Y), T),
+    spikes(X - 1, Y),
+    not do(on_spike, T + 1).
 
 % effets
 fluent(at(X - 1, Y), T + 1) :-
@@ -230,7 +299,8 @@ fluent(at(X - 1, Y), T + 1) :-
     fluent(at(X, Y), T),
     cell(X - 1, Y),
     not fluent(box(X - 1, Y), T),
-    not fluent(monster(X - 1, Y), T).
+    not fluent(monster(X - 1, Y), T),
+    not fluent(chest(X - 1, Y), T).
 
 fluent(at(X - 1, Y), T + 1) :-
     do(down, T),
@@ -238,7 +308,27 @@ fluent(at(X - 1, Y), T + 1) :-
     cell(X - 1, Y),
     spikes(X - 1, Y),
     not fluent(box(X - 1, Y), T),
-    not fluent(monster(X - 1, Y), T).
+    not fluent(monster(X - 1, Y), T),
+    not fluent(chest(X - 1, Y), T).
+
+fluent(at(X, Y), T + 1) :-
+    do(down, T),
+    fluent(at(X, Y), T),
+    cell(X - 1, Y),
+    fluent(chest(X - 1, Y), T),
+    fluent(has_key(0), T).
+
+fluent(at(X - 1, Y), T + 1) :-
+    do(down, T),
+    fluent(at(X, Y), T),
+    cell(X - 1, Y),
+    fluent(chest(X - 1, Y), T),
+    fluent(has_key(1), T).
+
+removed(chest(X - 1, Y), T + 1) :-
+    do(down, T),
+    fluent(at(X, Y), T),
+    fluent(has_key(1), T).
 
 removed(at(X, Y), T) :-
     do(down, T),
@@ -575,6 +665,26 @@ fluent(at(X, Y), T) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% KEY AND CHEST %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fluent(has_key(1), T) :-
+    do(right, T),
+    fluent(at(X, Y), T),
+    fluent(key(X, Y + 1), T).
+
+fluent(has_key(1), T) :-
+    do(left, T),
+    fluent(at(X, Y), T),
+    fluent(key(X, Y - 1), T).
+
+fluent(has_key(1), T) :-
+    do(down, T),
+    fluent(at(X, Y), T),
+    fluent(key(X - 1, Y), T).
+
+fluent(has_key(1), T) :-
+    do(up, T),
+    fluent(at(X, Y), T),
+    fluent(key(X + 1, Y), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
