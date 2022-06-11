@@ -14,42 +14,35 @@
 
 step(0..maxstep-1).
 
-cell(0, 0..6).
-cell(1, 0). cell(1, 2). cell(1, 4). cell(1, 6).
-cell(2, 2..6).
-cell(3, 2). cell(3, 4). cell(3, 6..7).
-cell(4, 2..7).
-cell(5, 6).
-cell(6, 3..6).
+cell(0, 1..5).
+cell(1, 0..7).
+cell(2, 0..7).
+cell(3, 0..6).
+cell(4, 0). cell(4, 2..4).
 
 %%%%%% INIT %%%%%%
 % player
-init(at(4, 7)).
+init(at(4, 0)).
 
 % boxes
+init(box(4, 4)).
+init(box(3, 1)). init(box(3, 3)).
+init(box(2, 0)). init(box(2, 2)). init(box(2, 4)). init(box(2, 5)).
+init(box(1, 1)). init(box(1, 3)). init(box(1, 5)). init(box(1, 6)).
+init(box(0, 2)). init(box(0, 4)).
 
 % monsters
-init(monster(2, 4)).
-init(monster(0, 5)).
 
 % spikes
-spikes(1, 2).
-spikes(1, 4).
-spikes(2, 5).
-spikes(2, 6).
 spikes(3, 2).
-spikes(3, 4).
-spikes(4, 3).
-spikes(4, 4).
+spikes(3, 3).
 
 % demoness
-demoness(6, 3).
-demoness(6, 4).
-demoness(6, 5).
+demoness(2, 7).
 
 % chest & key
-init(chest(5, 6)).
-init(key(1, 0)).
+init(chest(3, 5)).
+init(key(4, 2)).
 
 init(has_key(0)).
 
@@ -76,7 +69,8 @@ action(
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
 
-goal(at(6, 6)).
+goal(at(2, 6)).
+goal(at(1, 7)).
 
 achieved(T) :- fluent(F, T), goal(F).
 
@@ -685,6 +679,9 @@ fluent(has_key(1), T) :-
     do(up, T),
     fluent(at(X, Y), T),
     fluent(key(X + 1, Y), T).
+
+removed(has_key(0), T) :-
+    fluent(has_key(1), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
