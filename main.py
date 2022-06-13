@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple, Callable, Set
 Action = namedtuple("action", ("verb", "direction"))
 
 actionNames = ["move", "push", "kill", "unlock/key"]
-# "unlock", "pushBlock", "pushMob", "killMob"
 
 actions = {d: [] for d in "hbgd"}
 
