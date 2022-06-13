@@ -20,19 +20,6 @@ State = namedtuple(
 
 # ALL UTILS
 
-# FROZEN SET (for immuable)
-def add_in_frozenset(fset: frozenset, elt: Tuple[int, int]) -> frozenset:
-    s = {x for x in fset}
-    s.add(elt)
-    return frozenset(s)
-
-
-def remove_in_frozenset(fset: frozenset, elt: Tuple[int, int]) -> frozenset:
-    s = {x for x in fset}
-    s.remove(elt)
-    return frozenset(s)
-
-
 # DICT 2 PATH (print)
 def dict2path(s: State, d: Dict[State, Tuple[State, Action]]) -> List[str]:
     l = [(s, None)]
@@ -316,7 +303,7 @@ def succ_factory(map_rules: Dict[str, set]) -> Set[Tuple[State, Action]]:
     return succ
 
 
-# SEARCH ALGO
+# SEARCH ALGO (BSF)
 def search_with_parent(s0, goals, succ, remove, insert, debug=True):
     l = [s0]
     save = {s0: None}
@@ -357,11 +344,11 @@ def main():
         debug=False,
     )
 
-    print("LIST OF STATES")
-    for s, a in dict2state(end, save):
-        if s:
-            print("State: ", s)
-            print("Action:", a)
+    # print("LIST OF STATES")
+    # for s, a in dict2state(end, save):
+    #     if s:
+    #         print("State: ", s)
+    #         print("Action:", a)
 
     # calcul du plan
     if end:
