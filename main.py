@@ -69,11 +69,11 @@ def insert_head(s: State, l: List[State]):
     return s
 
 
-def remove_head(s: State, l: List[State]):
+def remove_head(l: List[State]):
     return l.pop(0), l
 
 
-def remove_tail(s: State, l: List[State]):
+def remove_tail(l: List[State]):
     return l.pop(), l
 
 
@@ -356,44 +356,20 @@ def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State) -> int:
         keyFactor = 0
         if state.key:
-            keyFactor = 3
+            keyFactor = 4
+        lockFactor = 0
+        if state.lock and not state.key:
+            lockFactor = -1
         return (
                 min(
                     abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
                     for demon in map_rules["D"]
                 )
-                + (map_rules["max"] - state.steps)
-                + keyFactor
+                + (map_rules["max"] - state.steps)*0.7
+                + keyFactor + lockFactor
         )
 
     return dist_to_closest_demon
-
-# NEW VERSION OF HEURISTIC
-def manhattan_distance_proto_factory(map_rules: Dict[str, set]) -> Callable:
-    def dist_to_closest_demon(state: State, action: Action) -> int:
-        keyFactor = 0
-        if state.key:
-            keyFactor = 3
-        killFactor = 0
-        if action and action.verb == "kill":
-            killFactor = 3
-        pushFactor = 0
-        if action and action.verb == "push":
-            pushFactor = -2
-        unlockFactor = 0
-        if action and action.verb == "unlock/key" and not state.key:
-            unlockFactor = -2.5
-
-        return (
-                min(
-                    abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
-                    for demon in map_rules["D"]
-                )
-                + (map_rules["max"] - state.steps)
-                + keyFactor + killFactor + pushFactor + unlockFactor
-        )
-    return dist_to_closest_demon
-
 
 # SEARCH ALGO (GREEDY & A*)
 def search_heuristic(
@@ -405,7 +381,7 @@ def search_heuristic(
 ) -> Tuple[State, Dict[State, Action]]:
     l = []
     heapq.heapify(l)
-    heapq.heappush(l, (heuristic(s0, None), s0))
+    heapq.heappush(l, (heuristic(s0), s0))
     save = {s0: None}
     heapq.heapify(l)
     while l:
@@ -421,7 +397,7 @@ def search_heuristic(
                 save[s2] = (s, a)
                 if goals(s2):
                     return s2, save
-                heapq.heappush(l, (heuristic(s2, a), s2))
+                heapq.heappush(l, (heuristic(s2), s2))
     return None, save
 
 
@@ -492,7 +468,7 @@ def main():
             s0,
             goal_factory(map_rules),
             succ_factory(map_rules),
-            manhattan_distance_proto_factory(map_rules),
+            manhattan_distance_astar_factory(map_rules),
             debug=False,
         )
     if method == "greedy":
