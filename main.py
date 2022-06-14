@@ -324,9 +324,9 @@ def succ_factory(map_rules: Dict[str, set]) -> Callable[[State], Dict[State, Act
 
 # DEFINING HEURISTIC
 def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
-    def dist_to_closest_demon(position: Tuple[int, int]) -> int:
+    def dist_to_closest_demon(state: State) -> int:
         return min(
-            abs(position[0] - demon[0]) + abs(position[1] - demon[1])
+            abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
             for demon in map_rules["D"]
         )
 
@@ -335,10 +335,16 @@ def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
 
 def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State) -> int:
+        keyFactor = 0
+        if state.key:
+            keyFactor= 2
+        lockFactor = 0
+        if state.lock and state.key:
+            lockFactor = 1
         return min(
             abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
             for demon in map_rules["D"]
-        ) + (map_rules["max"] - state.steps)
+        ) + (map_rules["max"] - state.steps) + keyFactor + lockFactor
 
     return dist_to_closest_demon
 
@@ -468,6 +474,7 @@ def main():
     if end:
         plan = "".join([a for _, a in dict2path(end, save) if a])
         if check_plan(plan):
+            print("[Niveau] ", infos["title"])
             print(f"[Temps] {(stop-start)*1000:.2f} ms")
             print("[OK]", plan)
         else:
