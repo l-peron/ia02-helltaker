@@ -1,53 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%      HELLTAKER IN ASP      %%%
-%%%        version: 0.1        %%%
-%%%    authors : Adrien Simon  %%%
-%%%              Julie Pichon  %%%
-%%%              Léo Peron     %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%% clingo -c maxstep=n -n0 helltaker.lp
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%% INITIALISATION %%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-step(0..maxstep-1).
-
-cell(0, 1..7).
-cell(1, 0..8).
-cell(2, 0..8).
-cell(3, 3..5). cell(3, 1). cell(3, 7).
-cell(4, 3..5).
-cell(5, 3..5).
-
-%%%%%% INIT %%%%%%
-% player
-init(at(0, 1)).
-
-% boxes
-init(box(0, 3)). init(box(0, 6)).
-init(box(1, 1..3)). init(box(1, 6..7)).
-init(box(2, 1)). init(box(2, 3..5)).
-init(box(3, 1)). init(box(3, 3)).
-init(box(4, 3)). init(box(4, 5)).
-
-% monsters
-
-% spikes
-
-% trap
 state_trap(on; off).
-
-% demoness
-demoness(6, 3).
-
-% chest & key
-init(chest(4, 4)).
-init(key(2, 8)).
-
 init(has_key(0)).
-
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%
@@ -70,8 +22,6 @@ action(
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
-
-goal(at(5, 4)).
 
 achieved(T) :- fluent(F, T), goal(F).
 
