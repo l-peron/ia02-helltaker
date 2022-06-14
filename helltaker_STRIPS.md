@@ -1,6 +1,6 @@
-##Representation en STRIPS de Helltaker##
+**Representation en STRIPS de Helltaker**
 
-#Predicats#
+Predicats :
 _empty/2_
 _demoness/2_
 
