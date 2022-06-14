@@ -14,47 +14,47 @@
 
 step(0..maxstep-1).
 
-cell(0, 5).
-cell(1, 0..5).
-cell(2, 0). cell(2, 2..5).
-cell(3, 0). cell(3, 2..5).
-cell(4, 0). cell(4, 2..5).
-cell(5, 2..5).
-cell(6, 3..4).
+cell(0, 4..5).
+cell(1, 4..6).
+cell(2, 1..5).
+cell(3, 1). cell(3, 3..6).
+cell(4, 1..4).
+cell(5, 0..3).
+cell(6, 1..3).
+cell(7, 1..3).
 
 %%%%%% INIT %%%%%%
 % player
-init(at(4, 0)).
+init(at(7, 2)).
 
 % boxes
-init(box(5, 4)).
-init(box(4, 4)).
-init(box(2, 2)).
+init(box(6, 1)).
+init(box(6, 2)).
+init(box(6, 3)).
+init(box(4, 2)).
+init(box(3, 3)).
+init(box(3, 4)).
 init(box(2, 3)).
-init(box(2, 4)).
-init(box(2, 5)).
+init(box(1, 5)).
 
 % monsters
-init(monster(2, 0)).
+init(monster(3, 1)).
+init(monster(2, 5)).
 
 % spikes
 
 % trap
 state_trap(on; off).
 
-{trap(1, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 0, S, 0), S != on.
-{trap(1, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 2, S, 0), S != on.
-{trap(1, 5, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 5, S, 0), S != on.
-{trap(3, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(3, 3, S, 0), S != on.
-{trap(3, 5, S, T) : state_trap(S)} = 1 :- step(T). :- trap(3, 5, S, 0), S != on.
+{trap(4, 1, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 1, S, 0), S != on.
 {trap(4, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 2, S, 0), S != on.
 
 % demoness
-demoness(6, 4).
+demoness(0, 5).
 
 % chest & key
-init(chest(5, 3)).
-init(key(0, 5)).
+init(chest(1, 4)).
+init(key(5, 3)).
 
 init(has_key(0)).
 
@@ -81,8 +81,8 @@ action(
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
 
-goal(at(6, 3)).
-goal(at(5, 4)).
+goal(at(0, 4)).
+goal(at(1, 5)).
 
 achieved(T) :- fluent(F, T), goal(F).
 

@@ -14,47 +14,48 @@
 
 step(0..maxstep-1).
 
-cell(0, 5).
-cell(1, 0..5).
+cell(0, 0..3).
+cell(1, 0). cell(1, 3).
 cell(2, 0). cell(2, 2..5).
-cell(3, 0). cell(3, 2..5).
-cell(4, 0). cell(4, 2..5).
-cell(5, 2..5).
+cell(3, 0..5).
+cell(4, 0..1). cell(4, 3..5).
+cell(5, 3..5).
 cell(6, 3..4).
 
 %%%%%% INIT %%%%%%
 % player
-init(at(4, 0)).
+init(at(2, 5)).
 
 % boxes
-init(box(5, 4)).
+init(box(4, 3)).
 init(box(4, 4)).
-init(box(2, 2)).
-init(box(2, 3)).
-init(box(2, 4)).
-init(box(2, 5)).
+init(box(4, 5)).
+init(box(3, 1)).
+init(box(3, 4)).
 
 % monsters
-init(monster(2, 0)).
+init(monster(3, 0)).
+init(monster(3, 3)).
+init(monster(2, 2)).
 
 % spikes
 
 % trap
 state_trap(on; off).
 
-{trap(1, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 0, S, 0), S != on.
-{trap(1, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 2, S, 0), S != on.
-{trap(1, 5, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 5, S, 0), S != on.
-{trap(3, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(3, 3, S, 0), S != on.
-{trap(3, 5, S, T) : state_trap(S)} = 1 :- step(T). :- trap(3, 5, S, 0), S != on.
-{trap(4, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 2, S, 0), S != on.
+{trap(1, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 0, S, 0), S != off.
+{trap(0, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 0, S, 0), S != on.
+{trap(0, 1, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 1, S, 0), S != off.
+{trap(0, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 2, S, 0), S != on.
+{trap(0, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 3, S, 0), S != off.
+{trap(1, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 3, S, 0), S != on.
 
 % demoness
-demoness(6, 4).
+demoness(6, 3).
 
 % chest & key
-init(chest(5, 3)).
-init(key(0, 5)).
+init(chest(5, 4)).
+init(key(4, 1)).
 
 init(has_key(0)).
 
@@ -81,8 +82,8 @@ action(
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
 
-goal(at(6, 3)).
-goal(at(5, 4)).
+goal(at(6, 4)).
+goal(at(5, 3)).
 
 achieved(T) :- fluent(F, T), goal(F).
 
@@ -604,7 +605,9 @@ removed(box(X - 1, Y), T) :-
 fluent(monster(X, Y - 2), T + 1) :-
     do(monster_left, T),
     cell(X, Y - 2),
-    fluent(at(X, Y), T).
+    fluent(at(X, Y), T),
+    not fluent(box(X, Y - 2), T),
+    not fluent(chest(X, Y - 2), T).
 
 removed(monster(X, Y - 1), T) :-
     do(monster_left, T),
@@ -649,7 +652,9 @@ removed(monster(X, Y - 1), T) :-
 fluent(monster(X, Y + 2), T + 1) :-
     do(monster_right, T),
     cell(X, Y + 2),
-    fluent(at(X, Y), T).
+    fluent(at(X, Y), T),
+    not fluent(box(X, Y + 2), T),
+    not fluent(chest(X, Y + 2), T).
 
 removed(monster(X, Y + 1), T) :-
     do(monster_right, T),
@@ -694,7 +699,9 @@ removed(monster(X, Y + 1), T) :-
 fluent(monster(X + 2, Y), T + 1) :-
     do(monster_up, T),
     cell(X + 2, Y),
-    fluent(at(X, Y), T).
+    fluent(at(X, Y), T),
+    not fluent(box(X + 2, Y), T),
+    not fluent(chest(X + 2, Y), T).
 
 removed(monster(X + 1, Y), T) :-
     do(monster_up, T),
@@ -739,7 +746,9 @@ removed(monster(X + 1, Y), T) :-
 fluent(monster(X - 2, Y), T + 1) :-
     do(monster_down, T),
     cell(X - 2, Y),
-    fluent(at(X, Y), T).
+    fluent(at(X, Y), T),
+    not fluent(box(X - 2, Y), T),
+    not fluent(chest(X - 2, Y), T).
 
 removed(monster(X - 1, Y), T) :-
     do(monster_down, T),
@@ -787,7 +796,8 @@ fluent(at(X, Y), T) :-
 :- trap(X, Y, S1, T), trap(X, Y, S2, T + 1), S1 = S2.
 
 removed(monster(X, Y), T) :-
-    trap(X, Y, on, T).
+    trap(X, Y, on, T),
+    fluent(monster(X, Y), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% KEY AND CHEST %%%%%%
@@ -813,8 +823,13 @@ fluent(has_key(1), T) :-
     fluent(at(X, Y), T),
     fluent(key(X + 1, Y), T).
 
+removed(key(X, Y), T) :-
+    fluent(at(X, Y), T).
+
 removed(has_key(0), T) :-
-    fluent(has_key(1), T).
+    fluent(has_key(1), T),
+    fluent(at(X, Y), T),
+    fluent(key(X, Y), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
