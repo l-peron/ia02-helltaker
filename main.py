@@ -3,15 +3,24 @@ import time
 from optparse import OptionParser
 
 from helltaker_utils import grid_from_file, check_plan
-from collections import namedtuple
 import heapq
-from typing import Dict, List, Tuple, Callable, Set, NamedTuple, FrozenSet, Optional, Union
+from typing import (
+    Dict,
+    List,
+    Tuple,
+    Callable,
+    Set,
+    NamedTuple,
+    FrozenSet,
+    Optional,
+    Union,
+)
 
 Action = NamedTuple("Action", [("verb", str), ("direction", str)])
 
 actionNames = ["move", "push", "kill", "unlock/key"]
 
-actions: Dict[str, Optional[Action]] = {d: [] for d in "hbgd"}
+actions: Dict[str, Action] = {d: [] for d in "hbgd"}
 
 for d in "hbgd":
     for a in actionNames:
@@ -37,6 +46,7 @@ State = NamedTuple(
 def dict2path(
     s: State, d: Dict[State, Tuple[State, Action]]
 ) -> List[Tuple[State, Optional[str]]]:
+
     l: List[Tuple[State, Optional[str]]] = [(s, None)]
     while not d[s] is None:
         parent, a = d[s]
@@ -45,23 +55,25 @@ def dict2path(
     l.reverse()
     return l
 
+
 # PILE / FILES UTILS
 
-def insert_tail(s, l):
+
+def insert_tail(s: State, l: List[State]):
     l.append(s)
     return l
 
 
-def insert_head(s, l):
+def insert_head(s: State, l: List[State]):
     l.insert(0, s)
     return s
 
 
-def remove_head(l):
+def remove_head(s: State, l: List[State]):
     return l.pop(0), l
 
 
-def remove_tail(l):
+def remove_tail(s: State, l: List[State]):
     return l.pop(), l
 
 
@@ -69,6 +81,7 @@ def remove_tail(l):
 def parsingInfos(
     grid: List[List[str]], maxstep: int, m: int, n: int
 ) -> Tuple[Dict[str, set], State]:
+
     hero = None
     blocks = set()
     key = None
@@ -77,7 +90,12 @@ def parsingInfos(
     safeTraps = set()
     unsafeTraps = set()
 
-    map_rules: Dict[str, Union[set,int]] = {"D": set(), "S": set(), "#": set(), "max": int}
+    map_rules: Dict[str, Union[set, int]] = {
+        "D": set(),
+        "S": set(),
+        "#": set(),
+        "max": int,
+    }
 
     map_rules["max"] = maxstep
 
@@ -338,10 +356,14 @@ def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
         keyFactor = 0
         if state.key:
             keyFactor = 3
-        return min(
-            abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
-            for demon in map_rules["D"]
-        ) + (map_rules["max"] - state.steps) + keyFactor
+        return (
+            min(
+                abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
+                for demon in map_rules["D"]
+            )
+            + (map_rules["max"] - state.steps)
+            + keyFactor
+        )
 
     return dist_to_closest_demon
 
@@ -408,16 +430,23 @@ def search_with_parents(
 def readCommand(argv: List[str]) -> List[str]:
 
     parser = OptionParser()
-    parser.add_option('-l', '--level', dest='HellTakerLevels',
-                      help='level of game to play', default='level1.txt')
-    parser.add_option('-m', '--method', dest='agentMethod',
-                      help='research method', default='astar')
+    parser.add_option(
+        "-l",
+        "--level",
+        dest="HellTakerLevels",
+        help="level of game to play",
+        default="level1.txt",
+    )
+    parser.add_option(
+        "-m", "--method", dest="agentMethod", help="research method", default="astar"
+    )
     args = dict()
     options, _ = parser.parse_args(argv)
 
-    args['layout'] = grid_from_file('maps/'+options.HellTakerLevels)
-    args['method'] = options.agentMethod
+    args["layout"] = grid_from_file("maps/" + options.HellTakerLevels)
+    args["method"] = options.agentMethod
     return args
+
 
 def main():
 
@@ -454,7 +483,7 @@ def main():
             succ_factory(map_rules),
             remove_head,
             insert_tail,
-            debug = False,
+            debug=False,
         )
     if method == "dfs":
         end, save = search_with_parents(
