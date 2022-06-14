@@ -69,11 +69,11 @@ def insert_head(s: State, l: List[State]):
     return s
 
 
-def remove_head(s: State, l: List[State]):
+def remove_head(l: List[State]):
     return l.pop(0), l
 
 
-def remove_tail(s: State, l: List[State]):
+def remove_tail(l: List[State]):
     return l.pop(), l
 
 
@@ -261,26 +261,27 @@ def do_inplace(action: Action, state: State, map_rules: Dict[str, set[int]]):
 
     if action.verb == "push":
         newPose = one_step(newHero, action.direction)
-        if (
-            (newHero in blocks | mobs)
-            and free(newPose)
-            and not (newPose in mobs | blocks)
-            and not newPose == lock
-        ):
-            if newHero in blocks:
+        if newHero in blocks:
+            if not free(newPose) or newPose in mobs | blocks or newPose == lock:
+                return updating_state(
+                    map_rules,
+                    state,
+                    hero
+                )
+            elif free(newPose) and (not newPose in mobs | blocks) and newPose != lock:
                 return updating_state(
                     map_rules,
                     state,
                     hero,
-                    blocks=moving_frozenset(blocks, newHero, newPose),
+                    blocks=moving_frozenset(blocks, newHero, newPose)
                 )
-            if newHero in mobs and newPose != key:
-                return updating_state(
-                    map_rules,
-                    state,
-                    hero,
-                    mobs=moving_frozenset(mobs, newHero, newPose),
-                )
+        if newHero in mobs and newPose != key and free(newPose) and not (newPose in mobs | blocks) and not newPose == lock:
+            return updating_state(
+                map_rules,
+                state,
+                hero,
+                mobs=moving_frozenset(mobs, newHero, newPose),
+            )
 
     if action.verb == "kill":
         newPose = one_step(newHero, action.direction)
@@ -355,20 +356,22 @@ def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State) -> int:
         keyFactor = 0
         if state.key:
-            keyFactor = 3
+            keyFactor = 4
+        lockFactor = 0
+        if state.lock and not state.key:
+            lockFactor = -1
         return (
-            min(
-                abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
-                for demon in map_rules["D"]
-            )
-            + (map_rules["max"] - state.steps)
-            + keyFactor
+                min(
+                    abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
+                    for demon in map_rules["D"]
+                )
+                + (map_rules["max"] - state.steps)*0.7
+                + keyFactor + lockFactor
         )
 
     return dist_to_closest_demon
 
-
-# SEARCH ALGO (GREEDY)
+# SEARCH ALGO (GREEDY & A*)
 def search_heuristic(
     s0: State,
     goals: Callable,
@@ -443,7 +446,7 @@ def readCommand(argv: List[str]) -> List[str]:
     args = dict()
     options, _ = parser.parse_args(argv)
 
-    args["layout"] = grid_from_file("maps/" + options.HellTakerLevels)
+    args["layout"] = grid_from_file(options.HellTakerLevels)
     args["method"] = options.agentMethod
     return args
 
