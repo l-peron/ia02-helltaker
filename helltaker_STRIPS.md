@@ -34,322 +34,357 @@ arriver a la case a cote du démon :
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y') ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ ¬lock(x,y') ∧ ¬key(x,y') ∧ ¬demoness(x,y')
   Effets:
-    man(x,y') ∧ ¬man(x,y)) ∧ time(t+1)
+    man(x,y') ∧ ¬man(x,y)) ∧ time(t-1)
 
 - do(movedown,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ ¬lock(x,y') ∧ ¬demoness(x,y') ∧ ¬key(x,y')
   Effets :
-    man(x,y')∧ ¬man(x,y)) ∧ time(t+1)
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1)
 
 - do(moveleft,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ ¬lock(x',y) ∧ ¬demoness(x',y) ∧ ¬key(x',y)
   Effets :
-    man(x,y')∧ ¬man(x,y)) ∧ time(t+1)
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1)
 
 - do(moveright,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ ¬lock(x',y) ∧ ¬demoness(x',y) ∧ ¬key(x',y)
   Effets :
-    man(x,y')∧ ¬man(x,y)) ∧ time(t+1)
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1)
 
 ____
 
-- do(pushblockup,(x,y),(x',y'),time(t))
+- do(kickblockup,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ block(x,y') ∧ ¬block(x,y") ∧ empty(x,y") ∧ ¬skeleton(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
   Effets:
-    ¬block(x,y') ∧ block(x,y") ∧ time(t+1)
+    ¬block(x,y') ∧ block(x,y") ∧ time(t-1)
 
-- do(pushblockdown,(x,y),(x',y'),time(t))
+- do(kickblockdown,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ block(x,y') ∧ ¬block(x,y") ∧ empty(x,y") ∧ ¬skeleton(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
   Effets :
-    ¬block(x,y') ∧ block(x,y") ∧ time(t+1)
+    ¬block(x,y') ∧ block(x,y") ∧ time(t-1)
 
-- do(pushblockleft,(x,y),(x',y'),time(t))
+- do(kickblockleft,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ block(x',y) ∧ ¬block(x",y) ∧ empty(x",y) ∧ ¬skeleton(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
   Effets :
-    ¬block(x',y) ∧ block(x",y) ∧ time(t+1)
+    ¬block(x',y) ∧ block(x",y) ∧ time(t-1)
 
-- do(pushblockright,(x,y),(x',y'),time(t))
+- do(kickblockright,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ block(x',y) ∧ ¬block(x",y) ∧ empty(x",y) ∧ ¬skeleton(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
   Effets :
-    ¬block(x',y) ∧ block(x",y) ∧ time(t+1)
+    ¬block(x',y) ∧ block(x",y) ∧ time(t-1)
 
 ___
 
-- do(pushskeletonup,(x,y),(x',y'),time(t))
+- do(kickskeletonup,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ skeleton(x,y') ∧ empty(x,y") ∧ ¬squeleton(x,y") ∧ ¬block(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ skeleton(x,y") ∧ time(t+1)
+    ¬skeleton(x,y') ∧ skeleton(x,y") ∧ time(t-1)
 
-- do(pushskeletondown,(x,y),(x',y'),time(t))
+- do(kickskeletondown,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ skeleton(x,y') ∧ empty(x,y") ∧ ¬squeleton(x,y") ∧ ¬block(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
   Effets :
-    ¬skeleton(x,y') ∧ skeleton(x,y") ∧ time(t+1)
+    ¬skeleton(x,y') ∧ skeleton(x,y") ∧ time(t-1)
 
-- do(pushskeletonleft,(x,y),(x',y'),time(t))
+- do(kickskeletonleft,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ skeleton(x',y) ∧ empty(x",y) ∧ ¬squeleton(x",y) ∧ ¬block(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ skeleton(x",y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ skeleton(x",y) ∧ time(t-1)
 
-- do(pushskeletonright,(x,y),(x',y'),time(t))
+- do(kickskeletonright,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ skeleton(x',y) ∧ empty(x",y) ∧ ¬squeleton(x",y) ∧ ¬block(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ skeleton(x",y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ skeleton(x",y) ∧ time(t-1)
 
 ___
 
-- do(pushskeleton_on_trap_up,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_trap_up,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ empty(x,y") ∧ skeleton(x,y') ∧ trap(x,y") ∧ ¬block(x,y") ∧ ¬lock(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_trap_down,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_trap_down,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ empty(x,y") ∧ skeleton(x,y') ∧ empty(x,y") ∧ ¬block(x,y') ∧ ¬lock(x,y')
   Effets :
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_trap_left,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_trap_left,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ empty(x",y) ∧ skeleton(x',y) ∧ empty(x",y) ∧ ¬block(x',y) ∧ ¬lock(x',y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
-- do(pushskeleton_on_trap_right,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_trap_right,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ empty(x",y) ∧ skeleton(x',y) ∧ empty(x",y) ∧ ¬block(x',y) ∧ ¬lock(x',y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
 ____
 
-- do(pushskeleton_on_wall_up,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_wall_up,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ skeleton(x,y') ∧ ¬empty(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_wall_down,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_wall_down,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ skeleton(x,y') ∧ ¬empty(x,y")
   Effets :
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_wall_left,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_wall_left,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ skeleton(x',y) ∧ ¬empty(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
-- do(pushskeleton_on_wall_right,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_wall_right,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ skeleton(x',y) ∧ ¬empty(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
 ___
 
-- do(pushskeletonup_on_block_up,(x,y),(x',y'),time(t))
+- do(kickskeletonup_on_block_up,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ skeleton(x,y') ∧ block(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_block_down,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_block_down,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ skeleton(x,y') ∧ block(x,y")
   Effets :
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_block_left,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_block_left,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ skeleton(x',y) ∧ block(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
-- do(pushskeleton_on_block_right,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_block_right,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ skeleton(x',y) ∧ block(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
 ____
 
-- do(pushskeleto_on_lock_up,(x,y),(x',y'),time(t))
+- do(kickskeleto_on_lock_up,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ skeleton(x,y') ∧ lock(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_lock_down,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_lock_down,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ skeleton(x,y') ∧ lock(x,y")
   Effets :
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_lock_left,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_lock_left,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ skeleton(x',y) ∧ lock(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
-- do(pushskeleton_on_lock_right,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_lock_right,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ skeleton(x',y) ∧ lock(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
 ___
 
-- do(pushskeleton_on_skeleton_up,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_skeleton_up,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ skeleton(x,y') ∧ skeleton(x,y")
   Effets:
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_skeleton_down,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_skeleton_down,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ skeleton(x,y') ∧ skeleton(x,y")
   Effets :
-    ¬skeleton(x,y') ∧ time(t+1)
+    ¬skeleton(x,y') ∧ time(t-1)
 
-- do(pushskeleton_on_skeleton_left,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_skeleton_left,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ skeleton(x',y) ∧ skeleton(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
-- do(pushskeleton_on_skeleton_right,(x,y),(x',y'),time(t))
+- do(kickskeleton_on_skeleton_right,(x,y),(x',y'),time(t))
   Conditions:
     t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ skeleton(x',y) ∧ skeleton(x",y)
   Effets :
-    ¬skeleton(x',y) ∧ time(t+1)
+    ¬skeleton(x',y) ∧ time(t-1)
 
+___
 
---------------------------------------------------------------------------------------------------------------
+- do(getkeyup,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y,y') ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ ¬lock(x,y') ∧ key(x,y') ∧ ¬demoness(x,y')
+  Effets:
+    man(x,y') ∧ ¬man(x,y)) ∧ time(t-1) ∧ haskey(1)
 
-Obtenir une Clé : Action? ou juste un booléen dans programme?
+- do(getkeydown,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y',y) ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ ¬lock(x,y') ∧ ¬demoness(x,y') ∧ key(x,y')
+  Effets :
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1) ∧ haskey(1)
 
-Action(ObtenirCléD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬skeleton(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y))
+- do(getkeyleft,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x,x') ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ ¬lock(x',y) ∧ ¬demoness(x',y) ∧ key(x',y)
+  Effets :
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1) ∧ haskey(1)
 
-Action(ObtenirCléG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬skeleton(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y))
+- do(getkeyright,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x',x) ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ ¬lock(x',y) ∧ ¬demoness(x',y) ∧ key(x',y)
+  Effets :
+    man(x,y')∧ ¬man(x,y)) ∧ time(t-1) ∧ haskey(1)
 
-Action(ObtenirCléH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ clé(x',y)∧ ¬block(x',y) ∧ ¬skeleton(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y))
+___
 
-Action(ObtenirCléB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ clé(x',y) ∧ ¬block(x',y) ∧ ¬skeleton(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y))
+- do(openlockup,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y,y') ∧ haskey(1) ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ lock(x,y') ∧ ¬demoness(x,y')
+  Effets:
+    time(t-1) ∧ ¬lock(x,y')
 
------------------------------------------------------------------------------------------------------------------
+- do(openlockdown,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y',y) ∧ haskey(1) ∧ ¬block(x,y') ∧ empty(x,y') ∧ ¬skeleton(x,y') ∧ lock(x,y') ∧ ¬demoness(x,y')
+  Effets :
+    time(t-1) ∧ ¬lock(x,y')
 
-Ouvrir une lock avec la clé : aClé est littéral qui dit si on a une clé ou pas!
+- do(openlockleft,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x,x') ∧ haskey(1) ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ lock(x',y) ∧ ¬demoness(x',y)
+  Effets :
+    time(t-1) ∧ ¬lock(x',y)
 
-Action(OuvrirlockD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ aClé ∧ lock(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬lock(x,y'))
+- do(openlockright,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x',x)  ∧ haskey(1) ∧ ¬block(x',y) ∧ empty(x',y) ∧ ¬skeleton(x',y) ∧ lock(x',y) ∧ ¬demoness(x',y)
+  Effets :
+    time(t-1) ∧ ¬lock(x',y)
 
-Action(OuvrirlockG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ aClé ∧ lock(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬lock(x,y'))
+___
 
-Action(OuvrirlockH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ aClé ∧ lock(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬lock(x',y))
+- do(kickblock_on_obstacle_up,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y,y')  ∧ next(y',y") ∧ block(x,y') ∧ ¬block(x,y") ∧ empty(x,y") ∧ ¬skeleton(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
+  Effets:
+    time(t-1)
 
-Action(OuvrirlockB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ aClé ∧ lock(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬lock(x',y))
+- do(kickblock_on_obstacle_down,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(y',y) ∧ next(y",y') ∧ block(x,y') ∧ ¬block(x,y") ∧ empty(x,y") ∧ ¬skeleton(x,y") ∧ ¬lock(x,y") ∧ ¬demoness(x,y")
+  Effets :
+    time(t-1)
 
----------------------------------------------------------------------------------------------------------------
+- do(kickblock_on_obstacle_left,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x,x') ∧ next(x',x") ∧ block(x',y) ∧ ¬block(x",y) ∧ empty(x",y) ∧ ¬skeleton(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
+  Effets :
+    time(t-1)
+
+- do(kickblock_on_obstacle_right,(x,y),(x',y'),time(t))
+  Conditions:
+    t>0 ∧ man(x,y) ∧ next(x',x) ∧ next(x",x') ∧ block(x',y) ∧ ¬block(x",y) ∧ empty(x",y) ∧ ¬skeleton(x",y) ∧ ¬lock(x",y) ∧ ¬demoness(x",y)
+  Effets :
+    time(t-1)
 
 Taper le Block (le block ne bouge pas, le perso non plus, on a juste utilisé un coup pour perdre du temps : si bloc,mur ou skeleton derrière)
 
-Action(PushBlockContreBlockD(x,y),
+Action(kickBlockContreBlockD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ block(x,y")
 EFFECT : )
 
-Action(PushBlockContreBlockG(x,y),
+Action(kickBlockContreBlockG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ block(x,y")
 EFFECT : )
 
-Action(PushBlockContreBlockH(x,y),
+Action(kickBlockContreBlockH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ block(x",y) ∧ block(x',y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
-Action(PushBlockContreBlockB(x,y),
+Action(kickBlockContreBlockB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ block(x",y)
 EFFECT : )
 
 
 --Pareil mais pour skeleton :
 
-Action(PushBlockContreskeletonD(x,y),
+Action(kickBlockContreskeletonD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ skeleton(x,y")
 EFFECT : )
 
-Action(PushBlockContreskeletonG(x,y),
+Action(kickBlockContreskeletonG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ skeleton(x,y")
 EFFECT : )
 
-Action(PushBlockContreskeletonH(x,y),
+Action(kickBlockContreskeletonH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ skeleton(x",y) ∧ block(x',y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
-Action(PushBlockContreskeletonB(x,y),
+Action(kickBlockContreskeletonB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ skeleton(x",y)
 EFFECT : )
 
 
 --Pareil mais pour Mur :
 
-Action(PushBlockContreMurD(x,y),
+Action(kickBlockContreMurD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ mur(x,y")
 EFFECT : )
 
-Action(PushBlockContreMurG(x,y),
+Action(kickBlockContreMurG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ mur(x,y")
 EFFECT : )
 
-Action(PushBlockContreMurH(x,y),
+Action(kickBlockContreMurH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ mur(x",y) ∧ block(x',y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
-Action(PushBlockContreMurB(x,y),
+Action(kickBlockContreMurB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ mur(x",y)
 EFFECT : )
 
 --Pareil mais pour lock :
 
-Action(PushBlockContrelockD(x,y),
+Action(kickBlockContrelockD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ lock(x,y")
 EFFECT : )
 
-Action(PushBlockContrelockG(x,y),
+Action(kickBlockContrelockG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ lock(x,y")
 EFFECT : )
 
-Action(PushBlockContrelockH(x,y),
+Action(kickBlockContrelockH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ lock(x",y) ∧ block(x',y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
-Action(PushBlockContrelockB(x,y),
+Action(kickBlockContrelockB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ lock(x",y)
 EFFECT : )
 
