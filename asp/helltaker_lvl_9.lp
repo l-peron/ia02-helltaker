@@ -12,7 +12,7 @@
 %%%%%%% INITIALISATION %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-step(0..maxstep-1).
+
 
 cell(0, 1..7).
 cell(1, 0..8).
@@ -37,7 +37,6 @@ init(box(4, 3)). init(box(4, 5)).
 % spikes
 
 % trap
-state_trap(on; off).
 
 % demoness
 demoness(6, 3).
@@ -45,9 +44,12 @@ demoness(6, 3).
 % chest & key
 init(chest(4, 4)).
 init(key(2, 8)).
+goal(at(5, 4)).
 
+step(0..maxstep-1).
+
+state_trap(on; off).
 init(has_key(0)).
-
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%
@@ -70,8 +72,6 @@ action(
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%% BUTS %%%%%%%
 %%%%%%%%%%%%%%%%%%%%
-
-goal(at(5, 4)).
 
 achieved(T) :- fluent(F, T), goal(F).
 

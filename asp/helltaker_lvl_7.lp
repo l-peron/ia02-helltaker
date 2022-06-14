@@ -12,7 +12,7 @@
 %%%%%%% INITIALISATION %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-step(0..maxstep-1).
+
 
 cell(0, 0..3).
 cell(1, 0). cell(1, 3).
@@ -41,7 +41,6 @@ init(monster(2, 2)).
 % spikes
 
 % trap
-state_trap(on; off).
 
 {trap(1, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 0, S, 0), S != off.
 {trap(0, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 0, S, 0), S != on.
@@ -57,8 +56,10 @@ demoness(6, 3).
 init(chest(5, 4)).
 init(key(4, 1)).
 
-init(has_key(0)).
+step(0..maxstep-1).
 
+init(has_key(0)).
+state_trap(on; off).
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%

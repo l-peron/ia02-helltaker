@@ -1,5 +1,57 @@
-state_trap(on; off).
+cell(6,3).
+demoness(6,3).
+goal(at(5,3)).
+goal(at(6,2)).
+goal(at(7,3)).
+goal(at(6,4)).
+cell(6,4).
+cell(5,3).
+cell(5,4).
+init(chest(5,4)).
+cell(5,5).
+cell(4,0).
+cell(4,1).
+init(key(4,1)).
+cell(4,3).
+init(box(4,3)).
+cell(4,4).
+init(box(4,4)).
+cell(4,5).
+init(box(4,5)).
+cell(3,0).
+init(monster(3,0)).
+cell(3,1).
+init(box(3,1)).
+cell(3,2).
+cell(3,3).
+init(monster(3,3)).
+cell(3,4).
+init(box(3,4)).
+cell(3,5).
+cell(2,0).
+cell(2,2).
+init(monster(2,2)).
+cell(2,3).
+cell(2,4).
+cell(2,5).
+init(at(2,5)).
+cell(1,0).
+{trap(1, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 0, S, 0), S != off.
+cell(1,3).
+{trap(1, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(1, 3, S, 0), S != on.
+cell(0,0).
+{trap(0, 0, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 0, S, 0), S != on.
+cell(0,1).
+{trap(0, 1, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 1, S, 0), S != off.
+cell(0,2).
+{trap(0, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 2, S, 0), S != on.
+cell(0,3).
+{trap(0, 3, S, T) : state_trap(S)} = 1 :- step(T). :- trap(0, 3, S, 0), S != off.
+
+step(0..maxstep-1).
+
 init(has_key(0)).
+state_trap(on; off).
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%

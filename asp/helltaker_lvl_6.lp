@@ -1,63 +1,57 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%      HELLTAKER IN ASP      %%%
-%%%        version: 0.1        %%%
-%%%    authors : Adrien Simon  %%%
-%%%              Julie Pichon  %%%
-%%%              Léo Peron     %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%% clingo -c maxstep=n -n0 helltaker.lp
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%% INITIALISATION %%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cell(7,1).
+cell(7,2).
+init(at(7,2)).
+cell(7,3).
+cell(6,1).
+init(box(6,1)).
+cell(6,2).
+init(box(6,2)).
+cell(6,3).
+init(box(6,3)).
+cell(5,0).
+cell(5,1).
+cell(5,2).
+cell(5,3).
+init(key(5,3)).
+cell(4,1).
+{trap(4, 1, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 1, S, 0), S != on.
+cell(4,2).
+init(box(4,2)).
+{trap(4, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 2, S, 0), S != on.
+cell(4,3).
+cell(4,4).
+cell(3,1).
+init(monster(3,1)).
+cell(3,3).
+init(box(3,3)).
+cell(3,4).
+init(box(3,4)).
+cell(3,5).
+cell(3,6).
+cell(2,1).
+cell(2,2).
+cell(2,3).
+init(box(2,3)).
+cell(2,4).
+cell(2,5).
+init(monster(2,5)).
+cell(1,4).
+init(chest(1,4)).
+cell(1,5).
+init(box(1,5)).
+cell(1,6).
+cell(0,4).
+cell(0,5).
+demoness(0,5).
+goal(at(-1,5)).
+goal(at(0,4)).
+goal(at(1,5)).
+goal(at(0,6)).
 
 step(0..maxstep-1).
 
-cell(0, 4..5).
-cell(1, 4..6).
-cell(2, 1..5).
-cell(3, 1). cell(3, 3..6).
-cell(4, 1..4).
-cell(5, 0..3).
-cell(6, 1..3).
-cell(7, 1..3).
-
-%%%%%% INIT %%%%%%
-% player
-init(at(7, 2)).
-
-% boxes
-init(box(6, 1)).
-init(box(6, 2)).
-init(box(6, 3)).
-init(box(4, 2)).
-init(box(3, 3)).
-init(box(3, 4)).
-init(box(2, 3)).
-init(box(1, 5)).
-
-% monsters
-init(monster(3, 1)).
-init(monster(2, 5)).
-
-% spikes
-
-% trap
-state_trap(on; off).
-
-{trap(4, 1, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 1, S, 0), S != on.
-{trap(4, 2, S, T) : state_trap(S)} = 1 :- step(T). :- trap(4, 2, S, 0), S != on.
-
-% demoness
-demoness(0, 5).
-
-% chest & key
-init(chest(1, 4)).
-init(key(5, 3)).
-
 init(has_key(0)).
-
+state_trap(on; off).
 fluent(F, 0) :- init(F).
 
 %%%%%% ACTIONS %%%%%%
@@ -813,8 +807,13 @@ fluent(has_key(1), T) :-
     fluent(at(X, Y), T),
     fluent(key(X + 1, Y), T).
 
+removed(key(X, Y), T) :-
+    fluent(at(X, Y), T).
+
 removed(has_key(0), T) :-
-    fluent(has_key(1), T).
+    fluent(has_key(1), T),
+    fluent(at(X, Y), T),
+    fluent(key(X, Y), T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
