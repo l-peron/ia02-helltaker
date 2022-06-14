@@ -48,7 +48,7 @@ def grid_from_file(filename: str, voc: dict = {}):
         - le nombre maximal de coups max_steps
     """
 
-    grid = []
+    grid: List[List[str]] = []
     m = 0  # nombre de lignes
     n = 0  # nombre de colonnes
     no = 0  # numéro de ligne du fichier

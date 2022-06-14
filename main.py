@@ -3,25 +3,27 @@ from helltaker_utils import grid_from_file, check_plan
 from collections import namedtuple
 from typing import Dict, List, Tuple, Callable, Set
 
-Action = namedtuple("action", ("verb", "direction"))
+Action = namedtuple("Action", ("verb", "direction"))
 
 actionNames = ["move", "push", "kill", "unlock/key"]
 
-actions = {d: [] for d in "hbgd"}
+actions: Dict[str, Action] = {d: [] for d in "hbgd"}
 
 for d in "hbgd":
     for a in actionNames:
         actions[d].append(Action(a, d))
 
 State = namedtuple(
-    "state",
+    "State",
     ("hero", "steps", "blocks", "key", "lock", "mobs", "safeTraps", "unsafeTraps"),
 )
 
 # ALL UTILS
 
 # DICT 2 PATH (print)
-def dict2path(s: State, d: Dict[State, Tuple[State, Action]]) -> List[str]:
+def dict2path(
+    s: State, d: Dict[State, Tuple[State, Action]]
+) -> List[Tuple[State, str]]:
     l = [(s, None)]
     while not d[s] is None:
         parent, a = d[s]
@@ -77,7 +79,7 @@ def parsingInfos(
     safeTraps = set()
     unsafeTraps = set()
 
-    map_rules = {"D": set(), "S": set(), "#": set()}
+    map_rules: Dict[str, set] = {"D": set(), "S": set(), "#": set()}
 
     for x in range(m):
         for y in range(n):
@@ -142,7 +144,7 @@ def modify_state_factory(state: State) -> Callable:
 
 
 def moving_frozenset(
-    fset: frozenset, supr: Tuple[int, int] = [], new: Tuple[int, int] = []
+    fset: frozenset, supr: Tuple[int, int] = None, new: Tuple[int, int] = None
 ):
     raw = {x for x in fset}
     if supr:
@@ -168,7 +170,7 @@ def updating_state(
     blocks: List[Tuple[int, int]] = [],
     keyFinded: bool = False,
     lockOpenable: bool = False,
-    mobCleared: bool = False
+    mobCleared: bool = False,
 ):
 
     # KILLINGS MOBS
@@ -217,7 +219,7 @@ def updating_state(
         )
 
 
-def do_inplace(action: Action, state: State, map_rules: Dict[str, set]):
+def do_inplace(action: Action, state: State, map_rules: Dict[str, set[int]]):
 
     hero = state.hero
     blocks = state.blocks
@@ -269,7 +271,11 @@ def do_inplace(action: Action, state: State, map_rules: Dict[str, set]):
         ):
             if not moving_frozenset(mobs, newHero):
                 return updating_state(
-                    map_rules, state, hero, mobs=moving_frozenset(mobs, newHero), mobCleared=True
+                    map_rules,
+                    state,
+                    hero,
+                    mobs=moving_frozenset(mobs, newHero),
+                    mobCleared=True,
                 )
             else:
                 return updating_state(
@@ -305,8 +311,8 @@ def goal_factory(map_rules: Dict[str, set]) -> Callable[[State], bool]:
 
 
 # DEFINING SUCCESSORS
-def succ_factory(map_rules: Dict[str, set]) -> Set[Tuple[State, Action]]:
-    def succ(state):
+def succ_factory(map_rules: Dict[str, set]) -> Callable[[State], Dict[State, Action]]:
+    def succ(state: State) -> Dict[State, Action]:
         l = []
         for x in actions.values():
             for a in x:
@@ -360,7 +366,14 @@ def search_greedy(s0, goals, succ, remove, insert, heuristic, debug=True):
 # SEARCH ALGO (A*)
 
 # SEARCH ALGO (DSF & BSF)
-def search_with_parents(s0: State, goals: Callable, succ: Callable, remove: Callable, insert: Callable, debug: bool=True) -> Tuple[State, Dict[State, Action]]:
+def search_with_parents(
+    s0: State,
+    goals: Callable,
+    succ: Callable,
+    remove: Callable,
+    insert: Callable,
+    debug: bool = True,
+) -> Tuple[State, Dict[State, Action]]:
     l = [s0]
     save = {s0: None}
     s = s0
@@ -380,6 +393,7 @@ def search_with_parents(s0: State, goals: Callable, succ: Callable, remove: Call
                 insert(s2, l)
     return None, save
 
+
 def main():
     # récupération du nom du fichier depuis la ligne de commande
     filename = sys.argv[1]
@@ -390,14 +404,14 @@ def main():
         infos["grid"], infos["max_steps"], infos["m"], infos["n"]
     )
 
-    end, save = search_with_parents(
-        s0,
-        goal_factory(map_rules),
-        succ_factory(map_rules),
-        remove_head,
-        insert_tail,
-        debug=False,
-    )
+    # end, save = search_with_parents(
+    #     s0,
+    #     goal_factory(map_rules),
+    #     succ_factory(map_rules),
+    #     remove_head,
+    #     insert_tail,
+    #     debug=False,
+    # )
 
     # end, save = search_with_parents(
     #     s0,
@@ -408,15 +422,15 @@ def main():
     #     debug=False,
     # )
 
-    # end, save = search_greedy(
-    #     s0,
-    #     goal_factory(map_rules),
-    #     succ_factory(map_rules),
-    #     remove_head,
-    #     insert_head,
-    #     manhattan_distance_factory(map_rules),
-    #     debug=True,
-    # )
+    end, save = search_greedy(
+        s0,
+        goal_factory(map_rules),
+        succ_factory(map_rules),
+        remove_head,
+        insert_head,
+        manhattan_distance_factory(map_rules),
+        debug=True,
+    )
 
     if end:
         plan = "".join([a for _, a in dict2path(end, save) if a])
@@ -428,6 +442,7 @@ def main():
         print("Pas de solution trouvée")
 
     sys.exit(2)
+
 
 if __name__ == "__main__":
     main()
