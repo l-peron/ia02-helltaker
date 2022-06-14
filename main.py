@@ -31,14 +31,17 @@ def dict2path(s: State, d: Dict[State, Tuple[State, Action]]) -> List[str]:
     return l
 
 
-def dict2state(s: State, d: Dict[State, Tuple[State, Action]]) -> List[str]:
+def dict2state(s: State, d: Dict[State, Tuple[State, Action]]) -> None:
     l = [(s, None)]
     while not d[s] is None:
         parent, a = d[s]
         l.append((parent, a.verb))
         s = parent
     l.reverse()
-    return l
+    for s, a in l:
+        if s:
+            print("State: ", s)
+            print("Action:", a)
 
 
 # PILE / FILES UTILS
@@ -48,6 +51,9 @@ def insert_tail(s, l):
     l.append(s)
     return l
 
+def insert_head(s ,l):
+    l.insert(0, s)
+    return s
 
 def remove_head(l):
     return l.pop(0), l
@@ -219,11 +225,6 @@ def do_inplace(action: Action, state: State, map_rules: Dict[str, set]):
     key = state.key
     lock = state.lock
 
-    # if not key:
-    #     print("key trouvée")
-    # if not lock:
-    #     print("lock ouvert")
-
     newHero = one_step(hero, action.direction)
 
     # DEFINES FACTORIES
@@ -248,7 +249,7 @@ def do_inplace(action: Action, state: State, map_rules: Dict[str, set]):
                     hero,
                     blocks=moving_frozenset(blocks, newHero, newPose),
                 )
-            if newHero in mobs:
+            if newHero in mobs and newPose != key:
                 return updating_state(
                     map_rules,
                     state,
@@ -302,9 +303,51 @@ def succ_factory(map_rules: Dict[str, set]) -> Set[Tuple[State, Action]]:
 
     return succ
 
+# DEFINING HEURISTIC
+def manhattan_distance_factory(map_rules: Dict[str,set]) -> Callable:
+    def dist_to_closest_demon(position: Tuple[int,int])->int:
+        goals = map_rules['D']
+        firstGoal = list(goals)[0]
+        minPose = abs(firstGoal[0] - position[0]) + abs(firstGoal[1] - position[1])
+        for goal in goals:
+            if abs(goal[0] - position[0]) + abs(goal[1] - position[1]) < minPose:
+                minPose = abs(goal[0] - position[0]) + abs(goal[1] - position[1])
+        return minPose
+    return dist_to_closest_demon
 
-# SEARCH ALGO (BSF)
-def search_with_parent(s0, goals, succ, remove, insert, debug=True):
+# SEARCH ALGO (GREEDY)
+def search_greedy(s0, goals, succ, remove, insert, heuristic, debug=True):
+    l = [s0]
+    save = {s0: None}
+    s = s0
+    while l:
+        s, l = remove(l)
+        saveState = None
+        saveA = None
+        for s2, a in succ(s).items():
+            if not s2:
+                continue
+            if not saveState and not saveA:
+                saveState = s2
+                saveA = a
+            if heuristic(saveState.hero) <= heuristic(s2.hero):
+                saveState = s2
+                saveA = a
+            if goals(s2):
+                return s2, save
+        if not saveState in save:
+            save[saveState] = (s, saveA)
+        if debug:
+            print("Previous State=", s)
+            print("A=", a)
+            print("New State =", s2)
+        insert(saveState, l)
+    return None, save
+
+# SEARCH ALGO (A*)
+
+# SEARCH ALGO (DSF)
+def search_dsf(s0, goals, succ, remove, insert, debug=True):
     l = [s0]
     save = {s0: None}
     s = s0
@@ -324,6 +367,27 @@ def search_with_parent(s0, goals, succ, remove, insert, debug=True):
                 insert(s2, l)
     return None, save
 
+# SEARCH ALGO (BSF)
+def search_bsf(s0, goals, succ, remove, insert, debug=True):
+    l = [s0]
+    save = {s0: None}
+    s = s0
+    while l:
+        s, l = remove(l)
+        for s2, a in succ(s).items():
+            if not s2:
+                continue
+            if debug:
+                print("Previous State=", s)
+                print("A=", a)
+                print("New State =", s2)
+            if not s2 in save:
+                save[s2] = (s, a)
+                if goals(s2):
+                    return s2, save
+                insert(s2, l)
+    return None, save
+
 
 def main():
     # récupération du nom du fichier depuis la ligne de commande
@@ -335,7 +399,7 @@ def main():
         infos["grid"], infos["max_steps"], infos["m"], infos["n"]
     )
 
-    end, save = search_with_parent(
+    end, save = search_bsf(
         s0,
         goal_factory(map_rules),
         succ_factory(map_rules),
@@ -344,11 +408,25 @@ def main():
         debug=False,
     )
 
-    # print("LIST OF STATES")
-    # for s, a in dict2state(end, save):
-    #     if s:
-    #         print("State: ", s)
-    #         print("Action:", a)
+    # end, save = search_dsf(
+    #     s0,
+    #     goal_factory(map_rules),
+    #     succ_factory(map_rules),
+    #     remove_head,
+    #     insert_head,
+    #     debug=False,
+    # )
+
+    # end, save = search_greedy(
+    #     s0,
+    #     goal_factory(map_rules),
+    #     succ_factory(map_rules),
+    #     remove_head,
+    #     insert_head,
+    #     manhattan_distance_factory(map_rules),
+    #     debug=True,
+    # )
+
 
     # calcul du plan
     if end:
@@ -361,7 +439,6 @@ def main():
         print("Pas de solution trouvée")
 
     sys.exit(2)
-
 
 def testing():
     mobs = set()
