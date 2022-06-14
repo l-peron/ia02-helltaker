@@ -261,26 +261,27 @@ def do_inplace(action: Action, state: State, map_rules: Dict[str, set[int]]):
 
     if action.verb == "push":
         newPose = one_step(newHero, action.direction)
-        if (
-            (newHero in blocks | mobs)
-            and free(newPose)
-            and not (newPose in mobs | blocks)
-            and not newPose == lock
-        ):
-            if newHero in blocks:
+        if newHero in blocks:
+            if not free(newPose) or newPose in mobs | blocks or newPose == lock:
+                return updating_state(
+                    map_rules,
+                    state,
+                    hero
+                )
+            elif free(newPose) and (not newPose in mobs | blocks) and newPose != lock:
                 return updating_state(
                     map_rules,
                     state,
                     hero,
-                    blocks=moving_frozenset(blocks, newHero, newPose),
+                    blocks=moving_frozenset(blocks, newHero, newPose)
                 )
-            if newHero in mobs and newPose != key:
-                return updating_state(
-                    map_rules,
-                    state,
-                    hero,
-                    mobs=moving_frozenset(mobs, newHero, newPose),
-                )
+        if newHero in mobs and newPose != key and free(newPose) and not (newPose in mobs | blocks) and not newPose == lock:
+            return updating_state(
+                map_rules,
+                state,
+                hero,
+                mobs=moving_frozenset(mobs, newHero, newPose),
+            )
 
     if action.verb == "kill":
         newPose = one_step(newHero, action.direction)
@@ -469,7 +470,7 @@ def readCommand(argv: List[str]) -> List[str]:
     args = dict()
     options, _ = parser.parse_args(argv)
 
-    args["layout"] = grid_from_file("levels/" + options.HellTakerLevels)
+    args["layout"] = grid_from_file(options.HellTakerLevels)
     args["method"] = options.agentMethod
     return args
 
