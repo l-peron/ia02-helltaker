@@ -1,24 +1,34 @@
 import sys
 import time
+from optparse import OptionParser
 
 from helltaker_utils import grid_from_file, check_plan
 from collections import namedtuple
 import heapq
-from typing import Dict, List, Tuple, Callable, Set
+from typing import Dict, List, Tuple, Callable, Set, NamedTuple, FrozenSet, Optional, Union
 
-Action = namedtuple("Action", ("verb", "direction"))
+Action = NamedTuple("Action", [("verb", str), ("direction", str)])
 
 actionNames = ["move", "push", "kill", "unlock/key"]
 
-actions: Dict[str, Action] = {d: [] for d in "hbgd"}
+actions: Dict[str, Optional[Action]] = {d: [] for d in "hbgd"}
 
 for d in "hbgd":
     for a in actionNames:
         actions[d].append(Action(a, d))
 
-State = namedtuple(
+State = NamedTuple(
     "State",
-    ("hero", "steps", "blocks", "key", "lock", "mobs", "safeTraps", "unsafeTraps"),
+    [
+        ("hero", Tuple[int, int]),
+        ("steps", int),
+        ("blocks", FrozenSet[Tuple[int, int]]),
+        ("key", Tuple[int, int]),
+        ("lock", Tuple[int, int]),
+        ("mobs", FrozenSet[Tuple[int, int]]),
+        ("safeTraps", FrozenSet[Tuple[int, int]]),
+        ("unsafeTraps", FrozenSet[Tuple[int, int]]),
+    ],
 )
 
 # ALL UTILS
@@ -26,8 +36,8 @@ State = namedtuple(
 # DICT 2 PATH (print)
 def dict2path(
     s: State, d: Dict[State, Tuple[State, Action]]
-) -> List[Tuple[State, str]]:
-    l = [(s, None)]
+) -> List[Tuple[State, Optional[str]]]:
+    l: List[Tuple[State, Optional[str]]] = [(s, None)]
     while not d[s] is None:
         parent, a = d[s]
         l.append((parent, a.direction))
@@ -35,22 +45,7 @@ def dict2path(
     l.reverse()
     return l
 
-
-def dict2state(s: State, d: Dict[State, Tuple[State, Action]]) -> None:
-    l = [(s, None)]
-    while not d[s] is None:
-        parent, a = d[s]
-        l.append((parent, a.verb))
-        s = parent
-    l.reverse()
-    for s, a in l:
-        if s:
-            print("State: ", s)
-            print("Action:", a)
-
-
 # PILE / FILES UTILS
-
 
 def insert_tail(s, l):
     l.append(s)
@@ -82,7 +77,7 @@ def parsingInfos(
     safeTraps = set()
     unsafeTraps = set()
 
-    map_rules: Dict[str, set] = {"D": set(), "S": set(), "#": set(), "max": int}
+    map_rules: Dict[str, Union[set,int]] = {"D": set(), "S": set(), "#": set(), "max": int}
 
     map_rules["max"] = maxstep
 
@@ -407,25 +402,66 @@ def search_with_parents(
     return None, save
 
 
-def main():
-    # récupération du nom du fichier depuis la ligne de commande
-    filename = sys.argv[1]
+def readCommand(argv: List[str]) -> List[str]:
 
-    # récupération de al grille et de toutes les infos
-    infos = grid_from_file(filename)
+    parser = OptionParser()
+    parser.add_option('-l', '--level', dest='HellTakerLevels',
+                      help='level of game to play', default='level1.txt')
+    parser.add_option('-m', '--method', dest='agentMethod',
+                      help='research method', default='astar')
+    args = dict()
+    options, _ = parser.parse_args(argv)
+
+    args['layout'] = grid_from_file('maps/'+options.HellTakerLevels)
+    args['method'] = options.agentMethod
+    return args
+
+def main():
+
+    # Récupération Grille et Méthode de recherche
+    infos, method = readCommand(sys.argv[1:]).values()
     map_rules, s0 = parsingInfos(
         infos["grid"], infos["max_steps"], infos["m"], infos["n"]
     )
 
     start = time.time()
 
-    end, save = search_heuristic(
-        s0,
-        goal_factory(map_rules),
-        succ_factory(map_rules),
-        manhattan_distance_astar_factory(map_rules),
-        debug=False,
-    )
+    end, save = None, None
+
+    if method == "astar":
+        end, save = search_heuristic(
+            s0,
+            goal_factory(map_rules),
+            succ_factory(map_rules),
+            manhattan_distance_astar_factory(map_rules),
+            debug=False,
+        )
+    if method == "greedy":
+        end, save = search_heuristic(
+            s0,
+            goal_factory(map_rules),
+            succ_factory(map_rules),
+            manhattan_distance_factory(map_rules),
+            debug=False,
+        )
+    if method == "bfs":
+        end, save = search_with_parents(
+            s0,
+            goal_factory(map_rules),
+            succ_factory(map_rules),
+            remove_head,
+            insert_tail,
+            debug = False,
+        )
+    if method == "dfs":
+        end, save = search_with_parents(
+            s0,
+            goal_factory(map_rules),
+            succ_factory(map_rules),
+            remove_head,
+            insert_head,
+            debug=False,
+        )
 
     stop = time.time()
 
