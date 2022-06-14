@@ -337,14 +337,11 @@ def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State) -> int:
         keyFactor = 0
         if state.key:
-            keyFactor= 2
-        lockFactor = 0
-        if state.lock and state.key:
-            lockFactor = 1
+            keyFactor = 3
         return min(
             abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
             for demon in map_rules["D"]
-        ) + (map_rules["max"] - state.steps) + keyFactor + lockFactor
+        ) + (map_rules["max"] - state.steps) + keyFactor
 
     return dist_to_closest_demon
 
