@@ -443,7 +443,7 @@ def readCommand(argv: List[str]) -> List[str]:
     args = dict()
     options, _ = parser.parse_args(argv)
 
-    args["layout"] = grid_from_file("maps/" + options.HellTakerLevels)
+    args["layout"] = grid_from_file("levels/" + options.HellTakerLevels)
     args["method"] = options.agentMethod
     return args
 
