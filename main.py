@@ -1,6 +1,9 @@
 import sys
+import time
+
 from helltaker_utils import grid_from_file, check_plan
 from collections import namedtuple
+import heapq
 from typing import Dict, List, Tuple, Callable, Set
 
 Action = namedtuple("Action", ("verb", "direction"))
@@ -79,7 +82,9 @@ def parsingInfos(
     safeTraps = set()
     unsafeTraps = set()
 
-    map_rules: Dict[str, set] = {"D": set(), "S": set(), "#": set()}
+    map_rules: Dict[str, set] = {"D": set(), "S": set(), "#": set(), "max": int}
+
+    map_rules["max"] = maxstep
 
     for x in range(m):
         for y in range(n):
@@ -333,37 +338,45 @@ def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
     return dist_to_closest_demon
 
 
+def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
+    def dist_to_closest_demon(state: State) -> int:
+        return min(
+            abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
+            for demon in map_rules["D"]
+        ) + (map_rules["max"] - state.steps)
+
+    return dist_to_closest_demon
+
+
 # SEARCH ALGO (GREEDY)
-def search_greedy(s0, goals, succ, remove, insert, heuristic, debug=True):
-    l = [s0]
+def search_heuristic(
+    s0: State,
+    goals: Callable,
+    succ: Callable,
+    heuristic,
+    debug: bool = True,
+) -> Tuple[State, Dict[State, Action]]:
+    l = []
+    heapq.heapify(l)
+    heapq.heappush(l, (heuristic(s0), s0))
     save = {s0: None}
-    s = s0
+    heapq.heapify(l)
     while l:
-        s, l = remove(l)
-        saveState = None
-        saveA = None
+        score, s = heapq.heappop(l)
         for s2, a in succ(s).items():
+            if debug:
+                print("Previous State=", s)
+                print("A=", a)
+                print("New State =", s2)
             if not s2:
                 continue
-            if not saveState and not saveA:
-                saveState = s2
-                saveA = a
-            if heuristic(saveState.hero) <= heuristic(s2.hero):
-                saveState = s2
-                saveA = a
-            if goals(s2):
-                return s2, save
-        if not saveState in save:
-            save[saveState] = (s, saveA)
-        if debug:
-            print("Previous State=", s)
-            print("A=", a)
-            print("New State =", s2)
-        insert(saveState, l)
+            if not s2 in save:
+                save[s2] = (s, a)
+                if goals(s2):
+                    return s2, save
+                heapq.heappush(l, (heuristic(s2), s2))
     return None, save
 
-
-# SEARCH ALGO (A*)
 
 # SEARCH ALGO (DSF & BSF)
 def search_with_parents(
@@ -404,37 +417,22 @@ def main():
         infos["grid"], infos["max_steps"], infos["m"], infos["n"]
     )
 
-    # end, save = search_with_parents(
-    #     s0,
-    #     goal_factory(map_rules),
-    #     succ_factory(map_rules),
-    #     remove_head,
-    #     insert_tail,
-    #     debug=False,
-    # )
+    start = time.time()
 
-    # end, save = search_with_parents(
-    #     s0,
-    #     goal_factory(map_rules),
-    #     succ_factory(map_rules),
-    #     remove_head,
-    #     insert_head,
-    #     debug=False,
-    # )
-
-    end, save = search_greedy(
+    end, save = search_heuristic(
         s0,
         goal_factory(map_rules),
         succ_factory(map_rules),
-        remove_head,
-        insert_head,
-        manhattan_distance_factory(map_rules),
-        debug=True,
+        manhattan_distance_astar_factory(map_rules),
+        debug=False,
     )
+
+    stop = time.time()
 
     if end:
         plan = "".join([a for _, a in dict2path(end, save) if a])
         if check_plan(plan):
+            print(f"[Temps] {(stop-start)*1000:.2f} ms")
             print("[OK]", plan)
         else:
             print("[Err]", plan, file=sys.stderr)
