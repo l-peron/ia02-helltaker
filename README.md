@@ -6,8 +6,14 @@ Projet de solving de niveau du jeu helltaker, comprenant une solution résolvant
 Projet réalisé par Adrien Simon, Julie Pichon, et Léo Peron.
 
 ## Lancement des solveurs
+### Comment exécuter espace d'état ?
 
-Dans chaque dossier correspondant aux différentes solutions, un README explique comment déployer la solution et l'utiliser sur les niveaux.
+Pour exécuter l'espace d'état, il suffit de faire 
+`python3 -l nomdufichier.txt`
+
+### Comment exécuter l'ASP ?
+En console, vous avez juste à taper `python3 main.py path_to_txt_file` pour lancer le programme.
+Le programme renverra sous la forme "hbgd" un modèle valide pour le niveau
 
 ## Structure des niveaux
 
@@ -43,7 +49,3 @@ Level 1
 #########
 ```
 
-## Comment exécuter espace d'état ?
-
-Pour exécuter l'espace d'état, il suffit de faire 
-`python3 -l nomdufichier.txt`
