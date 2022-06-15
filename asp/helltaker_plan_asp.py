@@ -5,18 +5,9 @@ import clingo
 
 
 def planify_asp(infos):
-    """
-    this function planifies the grid using the asp solver clingo
-    the grid is a file is in the infos argument
-    the basis og the asp file is in "helltaker.lp"
-    :param infos:
-    :return:
-    """
-
     basis = ""
 
-    pb = (
-"""\
+    pb = """\
 step(0..maxstep-1).
 
 init(has_key(0)).
@@ -810,7 +801,6 @@ fluent(F, T + 1) :-
 
 #show do/2.
 """
-    )
 
     # parse the grid in the level_specificities string
 
@@ -847,23 +837,18 @@ fluent(F, T + 1) :-
 
     asp = level_specificities + pb
 
-    print(level_specificities)
-
-    ctl = clingo.Control([f"-c maxstep={infos['max_steps']}"])
+    ctl = clingo.Control([f"-c maxstep={infos['max_steps']}"], logger=log)
     ctl.add("base", [], asp)
 
     ctl.ground([("base", [])])
 
     plan = [0] * infos["max_steps"]
 
-    with ctl.solve( yield_=True ) as handle:
+    with ctl.solve(yield_=True) as handle:
         for model in handle:
-            for atom in model.symbols( atoms=True ):
-                if atom.name == "do" :
-                    print(atom)
+            for atom in model.symbols(atoms=True):
+                if atom.name == "do":
                     plan[atom.arguments[1].number] = atom.arguments[0].name
-
-    print(plan)
 
     plan_str = ""
     for i in range(len(plan)):
@@ -876,8 +861,18 @@ fluent(F, T + 1) :-
         if "right" in plan[i]:
             plan_str += "d"
 
-
     return plan_str
+
+
+def log(code, message):
+    """Cette fonction permet de récupérer les logs et de ne rien en faire afin de ne pas
+    afficher des warnings inutiles dans la console lors du solving."""
+    pass
+
+
+def msg():
+    """Cette fonction récupère les messages des logs et n'en fait rien."""
+    return
 
 
 def main():
