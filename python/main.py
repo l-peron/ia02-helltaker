@@ -183,21 +183,21 @@ def free_factory(map_rules):
 def updating_state(
     map_rules: Dict[str, List[int]],
     state: State,
-    newHero: List[int],
-    mobs: List[Tuple[int, int]] = [],
-    blocks: List[Tuple[int, int]] = [],
+    newHero: Tuple[int],
+    mobs: FrozenSet[Tuple[int, int]] = [],
+    blocks: FrozenSet[Tuple[int, int]] = [],
     keyFinded: bool = False,
     lockOpenable: bool = False,
     mobCleared: bool = False,
 ):
 
     # KILLINGS MOBS
-    newMobs = list(state.mobs)
+    newMobs = state.mobs
     if mobs or mobCleared:
-        newMobs = list(mobs)
+        newMobs = frozenset(mobs)
     for mob in newMobs:
         if (mob in state.safeTraps) or (mob in map_rules["S"]):
-            newMobs.remove(mob)
+            newMobs = moving_frozenset(newMobs, supr=mob)
 
     # KEY AND CHEST INTERACTIONS
     newLock = state.lock
@@ -342,6 +342,8 @@ def succ_factory(map_rules: Dict[str, set]) -> Callable[[State], Dict[State, Act
 
 
 # DEFINING HEURISTIC
+
+# GLOUTON
 def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State) -> int:
         return min(
@@ -352,25 +354,26 @@ def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
     return dist_to_closest_demon
 
 
+# A*
 def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State, action: Action) -> int:
-        passedCost = (1/(1 + map_rules["max"] - state.steps))*2
-        booster = 1.5
+        passedCost = (1/(1 + map_rules["max"] - state.steps))
+        booster = 1
         manDist = 0
         if state.key:
             manDist = abs(state.key[0] - state.hero[0]) + abs(state.key[1] - state.hero[1])
             if action:
-                booster = (1.00, 0.75)[action.verb == "unlock/key"]
+                booster = (0.8, 0.6)[action.verb == "unlock/key"]
         if state.lock and not state.key:
             manDist = abs(state.lock[0] - state.hero[0]) + abs(state.lock[1] - state.hero[1])
             if action:
-                booster = (0.5, 0.25)[action.verb == "unlock/key"]
+                booster = (0.4, 0.2)[action.verb == "unlock/key"]
         else:
             manDist = min(
                 abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
                 for demon in map_rules["D"]
             )
-        return manDist*booster + passedCost*1.5
+        return manDist*1 + passedCost*1.5
 
     return dist_to_closest_demon
 
