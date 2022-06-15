@@ -42,3 +42,8 @@ Level 1
 # B B  D#
 #########
 ```
+
+## Comment exécuter espace d'état ?
+
+Pour exécuter l'espace d'état, il suffit de faire 
+`python3 -l nomdufichier.txt`
