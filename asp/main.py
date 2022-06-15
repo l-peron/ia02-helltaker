@@ -837,18 +837,22 @@ fluent(F, T + 1) :-
 
     asp = level_specificities + pb
 
-    ctl = clingo.Control([f"-c maxstep={infos['max_steps']}"], logger=log)
+    ctl = clingo.Control([f"-c maxstep={infos['max_steps']}"], logger=log) # ajouter '-n0' pour afficher tt les modeles
     ctl.add("base", [], asp)
 
     ctl.ground([("base", [])])
 
     plan = [0] * infos["max_steps"]
 
+    model_count = 0
     with ctl.solve(yield_=True) as handle:
         for model in handle:
+            model_count += 1
             for atom in model.symbols(atoms=True):
                 if atom.name == "do":
                     plan[atom.arguments[1].number] = atom.arguments[0].name
+
+    #print(f"Model count: {model_count}")
 
     plan_str = ""
     for i in range(len(plan)):
@@ -869,12 +873,6 @@ def log(code, message):
     afficher des warnings inutiles dans la console lors du solving."""
     pass
 
-
-def msg():
-    """Cette fonction récupère les messages des logs et n'en fait rien."""
-    return
-
-
 def main():
     # récupération du nom du fichier depuis la ligne de commande
     filename = sys.argv[1]
@@ -883,11 +881,15 @@ def main():
     infos = grid_from_file(filename)
 
     # calcul du plan
+    start = time.time()
     plan = planify_asp(infos)
+    end = time.time()
 
     # affichage du résultat
     if check_plan(plan):
+        # print(f"Temps d'exécution : {(end - start):.2f} secondes.")
         print("[OK]", plan)
+        # print("")
     else:
         print("[Err]", plan, file=sys.stderr)
         sys.exit(2)
