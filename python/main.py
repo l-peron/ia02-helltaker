@@ -357,23 +357,36 @@ def manhattan_distance_factory(map_rules: Dict[str, set]) -> Callable:
 # A*
 def manhattan_distance_astar_factory(map_rules: Dict[str, set]) -> Callable:
     def dist_to_closest_demon(state: State, action: Action) -> int:
+        manOrClid = True
         passedCost = (1/(1 + map_rules["max"] - state.steps))
         booster = 1
-        manDist = 0
+        minDist = 0
         if state.key:
-            manDist = abs(state.key[0] - state.hero[0]) + abs(state.key[1] - state.hero[1])
+            if manOrClid:
+                minDist = ((state.key[0] - state.hero[0])**2 + (state.key[1] - state.hero[1])**2)**(1/2)
+            else:
+                minDist = abs(state.key[0] - state.hero[0]) + abs(state.key[1] - state.hero[1])
             if action:
                 booster = (0.8, 0.6)[action.verb == "unlock/key"]
         if state.lock and not state.key:
-            manDist = abs(state.lock[0] - state.hero[0]) + abs(state.lock[1] - state.hero[1])
+            if manOrClid:
+                minDist = ((state.lock[0] - state.hero[0]) ** 2 + (state.lock[1] - state.hero[1]) ** 2) ** (1/2)
+            else:
+                minDist = abs(state.lock[0] - state.hero[0]) + abs(state.lock[1] - state.hero[1])
             if action:
                 booster = (0.4, 0.2)[action.verb == "unlock/key"]
         else:
-            manDist = min(
-                abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
-                for demon in map_rules["D"]
-            )
-        return manDist*1 + passedCost*1.5
+            if manOrClid:
+                minDist = min(
+                    ((demon[0] - state.hero[0]) ** 2 + (demon[1] - state.hero[1]) ** 2) ** (1/2)
+                    for demon in map_rules["D"]
+                )
+            else:
+                minDist = min(
+                    abs(state.hero[0] - demon[0]) + abs(state.hero[1] - demon[1])
+                    for demon in map_rules["D"]
+                )
+        return minDist*1*booster + passedCost*1.5
 
     return dist_to_closest_demon
 
