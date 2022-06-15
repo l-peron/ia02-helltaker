@@ -4,5 +4,5 @@ Ceci est un solveur codé en ASP, automatisé sous Python avec le module clingo 
 
 ### How to use
 
-- en console, vous avez juste à taper 'python3 main.py path_to_txt_file' pour lancer le programme
+- en console, vous avez juste à taper `python3 main.py path_to_txt_file` pour lancer le programme
 - le programme renverra sous la forme "hbgd" un modèle valide pour le niveau

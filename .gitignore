@@ -3,3 +3,5 @@
 venv/
 __pycache__/
 .mypy_cache/
+asp/__pycache__/
+asp/.mypy_cache/
