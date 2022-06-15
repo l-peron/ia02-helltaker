@@ -478,8 +478,6 @@ def main():
         infos["grid"], infos["max_steps"], infos["m"], infos["n"]
     )
 
-    start = time.time()
-
     end, save = None, None
 
     if method == "astar":
@@ -517,14 +515,12 @@ def main():
             debug=False,
         )
 
-    stop = time.time()
-
     if end:
         plan = "".join([a for _, a in dict2path(end, save) if a])
         if check_plan(plan):
-            print("[Niveau] ", infos["title"])
-            print(f"[Temps] {(stop-start)*1000:.2f} ms")
-            print("[OK]", plan)
+            #print("[Niveau] ", infos["title"])
+            #print(f"[Temps] {(stop-start)*1000:.2f} ms")
+            print(plan)
         else:
             print("[Err]", plan, file=sys.stderr)
     else:
