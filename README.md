@@ -9,7 +9,7 @@ Projet réalisé par Adrien Simon, Julie Pichon, et Léo Peron.
 ### Comment exécuter espace d'état ?
 
 Pour exécuter l'espace d'état, il suffit de faire 
-`python3 -l nomdufichier.txt`
+`python3 main.py -l nomdufichier.txt`
 
 ### Comment exécuter l'ASP ?
 En console, vous avez juste à taper `python3 main.py path_to_txt_file` dans le dossier pour lancer le programme.
